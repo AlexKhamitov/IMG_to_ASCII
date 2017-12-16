@@ -25,6 +25,19 @@ namespace aalib {
             aa_close(context);
         }
 
+        Context(Context&& context)
+            :context(context.context)
+        {
+            context.context = nullptr;
+        }
+
+        Context& operator = (Context&& context)
+        {
+            this->context = context.context;
+            context.context = nullptr;
+            return *this;
+        }
+
         void resize()
         {
             aa_resize(context);
