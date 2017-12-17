@@ -7,15 +7,17 @@
 #include <string>
 
 using namespace Magick;
-using namespace aalib;
+using namespace libaa;
 using std::size_t;
 using namespace std::experimental::filesystem;
 
-void print_text_to_file(unsigned char* text, Context& context, std::string directory)
+void print_text_to_file(const unsigned char* text,
+                        Context& context,
+                        std::string image_name)
 {
     try
     {
-        std::ofstream text_stream(directory + std::string("ascii.html"));
+        std::ofstream text_stream(image_name + std::string("-ascii.html"));
         text_stream.exceptions(std::ios_base::failbit|std::ios_base::badbit);
         text_stream << "<html><br />"
                        "<body bgcolor=\"#000000\" text=\"#b2b2b2\"<br />"
@@ -34,7 +36,8 @@ void print_text_to_file(unsigned char* text, Context& context, std::string direc
     }
     catch(std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << "Error: " << e.what() << '\n';
+        exit(1);
     }
 }
 
@@ -49,17 +52,17 @@ int pixel_to_aacolor(Color& color)
 }
 
 int main(int args, char * argv[]) {
-    //Image image("../IMG_to_ASCII/sources/a.png");
-    if(args < 3)
+    if(args != 3 || argv[2][0] != '.')
     {
-        std::cout << "Write directory and image name" << '\n';
-        return 0;
+        std::cout << "Usage: program_name image_name image_extension" << '\n';
+        return 1;
     }
     try
     {
-        std::string directory(argv[1]);
-        std::string image_name(argv[2]);
-        Image image(directory + image_name);
+        std::string image_name(argv[1]);
+        std::string image_extension(argv[2]);
+        Image image;
+        image.read(image_name + image_extension);
         Context context(image.columns(), image.rows());
         context.resize();
 
@@ -73,12 +76,13 @@ int main(int args, char * argv[]) {
         }
 
         context.render();
-        unsigned char *text = context.get_text();
-        print_text_to_file(text, context, directory);
+        const unsigned char *text = context.get_text();
+        print_text_to_file(text, context, image_name);
+        std::cout << "Result: " << image_name << "-ascii.html" << '\n';
     }
     catch(std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << "Error: " << e.what() << '\n';
         return 1;
     }
 }

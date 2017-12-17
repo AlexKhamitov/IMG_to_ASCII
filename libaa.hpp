@@ -4,7 +4,7 @@
 #include <aalib.h>
 #include <cstddef>
 
-namespace aalib {
+namespace libaa {
 
     using std::size_t;
 
@@ -25,16 +25,18 @@ namespace aalib {
             aa_close(context);
         }
 
-        Context(Context&& context)
-            :context(context.context)
+        Context(Context&& other)
+            :context(other.context)
         {
-            context.context = nullptr;
+            other.context = nullptr;
         }
 
-        Context& operator = (Context&& context)
-        {
-            this->context = context.context;
-            context.context = nullptr;
+        Context& operator = (Context&& other)
+        {   if(this != &other)
+            {
+                this->context = other.context;
+                other.context = nullptr;
+            }
             return *this;
         }
 
@@ -53,27 +55,27 @@ namespace aalib {
             aa_putpixel(context, x, y, color);
         }
 
-        unsigned char* get_text()
+        unsigned char* get_text() const
         {
             return aa_text(context);
         }
 
-        size_t get_img_width()
+        size_t get_img_width() const
         {
             return context->imgwidth;
         }
 
-        size_t get_img_height()
+        size_t get_img_height() const
         {
             return context->imgheight;
         }
 
-        size_t get_scr_width()
+        size_t get_scr_width() const
         {
             return aa_scrwidth(context);
         }
 
-        size_t get_scr_height()
+        size_t get_scr_height() const
         {
             return aa_scrheight(context);
         }
