@@ -34,7 +34,8 @@ namespace libaa {
         Context& operator = (Context&& other)
         {   if(this != &other)
             {
-                this->context = other.context;
+                aa_close(context);
+                context = other.context;
                 other.context = nullptr;
             }
             return *this;
