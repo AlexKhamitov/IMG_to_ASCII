@@ -63,22 +63,12 @@ namespace libaa {
 
         size_t get_img_width() const
         {
-            return context->imgwidth;
+            return aa_scrwidth(context);
         }
 
         size_t get_img_height() const
         {
-            return context->imgheight;
-        }
-
-        size_t get_scr_width() const
-        {
             return aa_scrwidth(context);
-        }
-
-        size_t get_scr_height() const
-        {
-            return aa_scrheight(context);
         }
     };
 

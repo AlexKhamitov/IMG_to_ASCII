@@ -22,11 +22,11 @@ void print_text_to_file(const unsigned char* text,
         text_stream << "<html><br />"
                        "<body bgcolor=\"#000000\" text=\"#b2b2b2\"<br />"
                        "<font color =#b2b2b2 size=2><pre>";
-        for(size_t y = 0; y < context.get_scr_height(); ++y)
+        for(size_t y = 0; y < context.get_img_height(); ++y)
         {
-            for(size_t x = 0; x < context.get_scr_width(); ++x)
+            for(size_t x = 0; x < context.get_img_width(); ++x)
             {
-                text_stream << text[y*context.get_scr_width() + x];
+                text_stream << text[y*context.get_img_width() + x];
             }
             text_stream << "<br />";
         }
