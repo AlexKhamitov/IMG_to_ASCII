@@ -6,13 +6,11 @@
 
 namespace libaa {
 
-    using std::size_t;
-
     class Context
     {
         aa_context *context;
     public:
-        Context(size_t width, size_t height)
+        Context(std::size_t width, std::size_t height)
         {
             aa_hardware_params params = aa_defparams;
             params.width = width;
@@ -51,7 +49,7 @@ namespace libaa {
             aa_render(context, &aa_defrenderparams, 0, 0, aa_scrwidth(context), aa_scrheight(context));
         }
 
-        void put_pixel(size_t x, size_t y, int color)
+        void put_pixel(std::size_t x, std::size_t y, int color)
         {
             aa_putpixel(context, x, y, color);
         }
@@ -61,12 +59,17 @@ namespace libaa {
             return aa_text(context);
         }
 
-        size_t get_img_width() const
+        unsigned char* get_attributes() const
+        {
+            return aa_attrs(context);
+        }
+
+        std::size_t get_img_width() const
         {
             return aa_scrwidth(context);
         }
 
-        size_t get_img_height() const
+        std::size_t get_img_height() const
         {
             return aa_scrwidth(context);
         }

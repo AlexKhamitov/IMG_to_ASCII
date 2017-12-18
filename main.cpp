@@ -8,30 +8,60 @@
 
 using namespace Magick;
 using namespace libaa;
-using std::size_t;
 using namespace std::experimental::filesystem;
 
+
+const char* int_to_color(int int_color)
+{
+    switch (int_color) {
+    case 0:
+        return "<font color=\"#b2b2b2\">";
+    case 1:
+        return "<font color=\"#686868\">";
+    case 2:
+        return "<font color=\"#ffffff\">";
+    case 3:
+        return "<font color=\"#ff0000\">";
+    case 4:
+        return "<font color=\"#ff0000\">";
+    case 5:
+        return "<font color=\"#ff0000\">";
+    default:
+        return "<font color=\"#ff0000\">";
+    }
+}
+
 void print_text_to_file(const unsigned char* text,
+                        const unsigned char* int_colors,
                         Context& context,
                         std::string image_name)
 {
     try
     {
+        int current_int_color = int_colors[0];
         std::ofstream text_stream(image_name + std::string("-ascii.html"));
         text_stream.exceptions(std::ios_base::failbit|std::ios_base::badbit);
         text_stream << "<html><br />"
                        "<body bgcolor=\"#000000\" text=\"#b2b2b2\"<br />"
-                       "<font color =#b2b2b2 size=2><pre>";
-        for(size_t y = 0; y < context.get_img_height(); ++y)
+                       "<font color =#b2b2b2 size=2><pre>"
+                    << int_to_color(current_int_color);
+        for(std::size_t y = 0; y < context.get_img_height(); ++y)
         {
-            for(size_t x = 0; x < context.get_img_width(); ++x)
+            for(std::size_t x = 0; x < context.get_img_width(); ++x)
             {
-                text_stream << text[y*context.get_img_width() + x];
+                std::size_t index = y*context.get_img_width() + x;
+                text_stream << text[index];
+                int int_color = int_colors[index];
+                if(int_color != current_int_color)
+                {
+                    current_int_color = int_color;
+                    text_stream << "</font>" << int_to_color(current_int_color);
+                }
             }
             text_stream << "<br />";
         }
 
-        text_stream << "</pre></font></body><br />"
+        text_stream << "</font></pre></font></body><br />"
                        "</html>";
     }
     catch(std::exception& e)
@@ -43,6 +73,7 @@ void print_text_to_file(const unsigned char* text,
 
 int pixel_to_aacolor(Color& color)
 {
+
     double r = sqrt(color.quantumRed());
     double g = sqrt(color.quantumGreen());
     double b = sqrt(color.quantumBlue());
@@ -66,9 +97,9 @@ int main(int args, char * argv[]) {
         Context context(image.columns(), image.rows());
         context.resize();
 
-        for(size_t x = 0; x < context.get_img_width(); ++x)
+        for(std::size_t y = 0; y < context.get_img_height(); ++y)
         {
-            for(size_t y = 0; y < context.get_img_height(); ++y)
+            for(std::size_t x = 0; x < context.get_img_width(); ++x)
             {
                 Color color = image.pixelColor(x,y);
                 context.put_pixel(x, y,pixel_to_aacolor(color));
@@ -77,7 +108,9 @@ int main(int args, char * argv[]) {
 
         context.render();
         const unsigned char *text = context.get_text();
-        print_text_to_file(text, context, image_name);
+        const unsigned char *int_colors = context.get_attributes();
+
+        print_text_to_file(text ,int_colors, context, image_name);
         std::cout << "Result: " << image_name << "-ascii.html" << '\n';
     }
     catch(std::exception& e)
